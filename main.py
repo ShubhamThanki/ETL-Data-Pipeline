@@ -3,12 +3,16 @@ import csv
 import AccExtract as AE
 import ModExtract as ME
 import connec_db as DB
+import DriveApiConnect as GDrive
 import datetime
 import handle_values as HV
+import EmailConnect as EC
 import pandas as pd
 import os
 import mysql.connector
 import random
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 
 
@@ -33,18 +37,28 @@ def main():
     conn = DB.connect_to_mysql()
     if conn:
         # Check for missing values and get clean data
-        clean_rows, header = HV.check_and_log_missing_values(account_path)
+        clean_rows, header,filename = HV.check_and_log_missing_values(account_path)
 
         # Load clean data into the database
         if clean_rows:
             HV.load_clean_data_to_db(clean_rows, header, "account", conn)
 
         conn.close()
-   
+    GDrive.upload_to_gdrive(account_path)
+
+
+    if filename:
+        # Send the missing rows file via email
+        EC.send_error_file_via_email(filename, "shubhamfifa12@gmail.com", "krkh ywpx xrli fxqg" , "shubham.thanki12@gmail.com")
+    else:
+        print("⚠️ No missing rows file to send via email.")
 
 # main function call
 if __name__ == "__main__":
     main()
     
+
+
+
 
 

@@ -1,0 +1,28 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ETL Dashboard</title>
+    <style>
+        body { font-family: Arial; background-color: #f4f4f4; padding: 40px; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .btn { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background-color: #218838; }
+        .status { margin-top: 20px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ETL Pipeline Dashboard</h1>
+        <form action="/run_etl" method="POST">
+            <button type="submit" class="btn">Run ETL Process</button>
+        </form>
+
+        {% if status %}
+            <div class="status">{{ status }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>

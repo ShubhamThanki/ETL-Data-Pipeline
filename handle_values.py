@@ -1,5 +1,7 @@
 import csv
+import random
 from datetime import datetime
+import pandas as pd
 import mysql.connector
 
 def check_and_log_missing_values(csv_file_path):
@@ -33,27 +35,32 @@ def check_and_log_missing_values(csv_file_path):
         else:
             print("✅ No missing values found in the CSV file.")
 
-        # Return rows without missing values and the header
-        return rows_without_missing_data, header
+        # Return rows without missing values
+        return rows_without_missing_data, header, filename
 
     except FileNotFoundError:
         print("❌ File not found. Please check the file path.")
-        return [], []  # Return empty lists if the file is not found
+        return [], []
     except Exception as e:
         print(f"❌ An error occurred: {e}")
-        return [], []  # Return empty lists if any other error occurs
+        return [], []
 
-def load_clean_data_to_db(rows, header, table_name, connection):
+def load_clean_data_to_db(rows_without_missing_data, header, table_name, connection):
     try:
         cursor = connection.cursor()
         # Generate the INSERT query dynamically based on the header
         columns = ", ".join(header)
         placeholders = ", ".join(["%s"] * len(header))
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-
+        query = f"""
+                INSERT INTO {table_name} (cust_id, acc_name, billin_city, billin_address_line1, 
+                                          billin_state, ship_state, ship_address_line1, 
+                                          ship_city, interest) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+        
         # Insert rows into the database
-        for row in rows:
-            cursor.execute(query, row)
+        for row in rows_without_missing_data:
+                cursor.execute(query, row)
 
         connection.commit()
         print(f"✅ Clean data loaded into table '{table_name}' successfully!")
